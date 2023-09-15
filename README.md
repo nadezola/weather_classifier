@@ -1,5 +1,5 @@
 # Weather Classifier
-Weather Classification on images from the [DILAM](https://arxiv.org/abs/2305.18953).
+Image Weather Classification with [DILAM](https://arxiv.org/abs/2305.18953) (https://github.com/jmiemirza/DILAM.git)
 
 ## Installation on Ubuntu 20.04
 1. Clone the repository recursively:
