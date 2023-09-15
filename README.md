@@ -6,7 +6,10 @@ Image Weather Classification with [DILAM](https://arxiv.org/abs/2305.18953)
 ```bash
 git clone --recurse-submodules https://github.com/nadezola/weather_classifier.git
 ```
-* (If you already cloned and forgot to use `--recurse-submodules` you can run `git submodule update --init`)
+* If you already cloned and forgot to use `--recurse-submodules` you can run: 
+```bash
+git submodule update --init
+```
 
 * We recommend to use Python3.8 virtual environment with `requirements.txt`
 
