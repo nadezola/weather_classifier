@@ -14,4 +14,3 @@ thop
 torch
 torchvision
 tqdm
-pandas
