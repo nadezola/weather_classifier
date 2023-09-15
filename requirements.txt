@@ -1,0 +1,16 @@
+matplotlib
+numpy
+onnx
+pandas
+Pillow
+protobuf
+PyYAML
+requests
+scikit_learn
+scipy
+seaborn
+setuptools
+thop
+torch
+torchvision
+tqdm
