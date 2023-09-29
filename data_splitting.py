@@ -1,9 +1,12 @@
 """
-Data pre-processing part:
-    Splits the train/val datasets by weather conditions:
-    Clear / Fog / Rain / Snow
+Data pre-processing part. Splits the train/val datasets by weather conditions:
+    Clear (train.txt / val.txt)
+    Fog (train.txt / val.txt)
+    Rain (train.txt / val.txt)
+    Snow (train.txt / val.txt)
+
 Usage (from root dir):
-    python data_preprocessing/data_splitting.py --data_root <path/to/data> --weather_lbls <path/to/weather_labels>
+    python data_splitting.py --data_root <path/to/data/root> --weather_lbls <path/to/weather/labels> --res <path/to/folder/where/save/results>
 """
 
 import argparse
@@ -11,30 +14,28 @@ import pandas as pd
 from pathlib import Path
 
 
+def make_dir(dir):
+    if not dir.exists():
+        dir.mkdir(parents=True)
+
+
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_root', action='store', default='data', help='Path to data root')
     parser.add_argument('--weather_lbls', action='store', default='data/weather_labels.csv',
                         help='Path to weather labels')
+    parser.add_argument('--res', action='store', default='data/splits',
+                        help='Path to save split results')
 
     args = parser.parse_args()
     return args
 
 
-def make_res_dirs(res_root):
-    clear_dir = res_root / 'clear'
-    fog_dir = res_root/'fog'
-    rain_dir = res_root/'rain'
-    snow_dir = res_root/'snow'
-
-    if not clear_dir.exists():
-        clear_dir.mkdir()
-    if not fog_dir.exists():
-        fog_dir.mkdir()
-    if not rain_dir.exists():
-        rain_dir.mkdir()
-    if not snow_dir.exists():
-        snow_dir.mkdir()
+def make_split_dirs(res_root):
+    make_dir(res_root /'clear')
+    make_dir(res_root/'fog')
+    make_dir(res_root/'rain')
+    make_dir(res_root/'snow')
 
 
 def split_set(data, weather_lbls):
@@ -49,18 +50,19 @@ def split_set(data, weather_lbls):
     snow_files = []
     other_files = []
 
-    for fname in data.values:
-        fhash = Path(fname[0]).stem.split('_')[0]
+    for f in data.values:
+        fhash = Path(f[0]).stem.split('_')[0]
+        fname = Path(f[0]).name
         if fhash in clear_hashes:
-            clear_files.extend(fname)
+            clear_files.append(fname)
         elif fhash in fog_hashes:
-            fog_files.extend(fname)
+            fog_files.append(fname)
         elif fhash in rain_hashes:
-            rain_files.extend(fname)
+            rain_files.append(fname)
         elif fhash in snow_hashes:
-            snow_files.extend(fname)
+            snow_files.append(fname)
         else:
-            other_files.extend(fname)
+            other_files.append(fname)
 
     return clear_files, fog_files, rain_files, snow_files, other_files
 
@@ -68,22 +70,20 @@ def split_set(data, weather_lbls):
 if __name__ == '__main__':
     args = parse_args()
     data_root = Path(args.data_root)
-    train_split_file = data_root/'train.txt'
-    val_split_file = data_root/'val.txt'
+    res_root = Path(args.res)
     weather_lbl_file = args.weather_lbls
-    res_root = Path('data/splits')
-    make_res_dirs(res_root)
 
-    train_split = pd.read_csv(train_split_file, header=None)
-    val_split = pd.read_csv(val_split_file, header=None)
+    train_txt = data_root/'train.txt'
+    val_txt = data_root/'val.txt'
+
+    train_split = pd.read_csv(train_txt, header=None)
+    val_split = pd.read_csv(val_txt, header=None)
+
     weather_lbls = pd.read_csv(weather_lbl_file, sep=';')
 
-    for phase in ['train', 'val']:
-        if phase == 'train':
-            data = train_split
-        if phase == 'val':
-            data = val_split
+    make_split_dirs(res_root)
 
+    for data in [train_split, val_split]:
         clear_files, fog_files, rain_files, snow_files, other_files = split_set(data, weather_lbls)
         with open(res_root/'clear'/f'{phase}.txt', 'w') as f:
             f.write('\n'.join(clear_files))

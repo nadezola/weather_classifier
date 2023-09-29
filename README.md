@@ -85,5 +85,5 @@ To train the Weather Classifier, you need to split train and val datsets by weat
 ```
 * To split, run:
 ```bash
-  python data_preprocessing/data_splitting.py --data_root <path/to/data> --weather_lbls <path/to/weather_labels>
+  python data_splitting.py --data_root <path/to/data> --weather_lbls <path/to/weather_labels> --res <path/to/folder/where/save/results>
 ```
