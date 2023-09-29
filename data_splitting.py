@@ -5,7 +5,7 @@ Data pre-processing part. Splits the train/val datasets by weather conditions:
     Rain (train.txt / val.txt)
     Snow (train.txt / val.txt)
 
-Usage (from root dir):
+Usage:
     python data_splitting.py --data_root <path/to/data/root> --weather_lbls <path/to/weather/labels> --res <path/to/folder/where/save/results>
 """
 

@@ -8,8 +8,8 @@ obj_det_numcls = 8  # Object classes number of pretrained weights ['Car', 'Van',
 
 # Weather Classification
 img_size = 640
-batch_size = 8
+batch_size = 32
 CLS_WEATHER = ['clear', 'fog', 'rain', 'snow']
-epochs = 1
+epochs = 100
 augment = False
 workers = 2

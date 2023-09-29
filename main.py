@@ -2,6 +2,8 @@
 Weather classification module.
 Uses first two layers of pre-trained YOLOv3 object detection model.
 
+Usage:
+    python main.py --data_root <path/to/data/root> --phase {'train'|'evaluate'} --res_dir <path/to/folder/where/save/results>
 """
 
 import argparse
