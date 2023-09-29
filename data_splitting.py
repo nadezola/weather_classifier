@@ -6,7 +6,7 @@ Data pre-processing part. Splits the train/val datasets by weather conditions:
     Snow (train.txt / val.txt)
 
 Usage:
-    python data_splitting.py --data_root <path/to/data/root> --weather_lbls <path/to/weather/labels> --res <path/to/folder/where/save/results>
+    python data_splitting.py --data_root <path/to/data/root> --weather_lbls <path/to/weather/labels> --res_dir <path/to/folder/where/save/results>
 """
 
 import argparse
@@ -24,7 +24,7 @@ def parse_args():
     parser.add_argument('--data_root', action='store', default='data', help='Path to data root')
     parser.add_argument('--weather_lbls', action='store', default='data/weather_labels.csv',
                         help='Path to weather labels')
-    parser.add_argument('--res', action='store', default='data/splits',
+    parser.add_argument('--res_dir', action='store', default='data/splits',
                         help='Path to save split results')
 
     args = parser.parse_args()
@@ -70,7 +70,7 @@ def split_set(data, weather_lbls):
 if __name__ == '__main__':
     args = parse_args()
     data_root = Path(args.data_root)
-    res_root = Path(args.res)
+    res_root = Path(args.res_dir)
     weather_lbl_file = args.weather_lbls
 
     train_txt = data_root/'train.txt'

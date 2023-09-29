@@ -66,6 +66,9 @@ data_root
 ### Splitting by Weather Condition:
 To train the Weather Classifier for 4 classes _**clear, fog, rain, snow**_, you need to split train and val datsets by weather conditions:
 ```
+data_root
+|
+...
 |
 ├── splits (initially empty folder)
 |      └─── clear
@@ -83,16 +86,21 @@ To train the Weather Classifier for 4 classes _**clear, fog, rain, snow**_, you 
 |      └─── snow
 |            ├─── train.txt
 |            └─── val.txt
+...
+|
 ```
 * We provide example code to split the data by weather conditions:
 ```bash
-  python data_splitting.py --data_root <path/to/data> --weather_lbls <path/to/weather_labels> --res <path/to/folder/where/save/results>
+  python data_splitting.py --data_root path/to/data_root --weather_lbls path/to/weather_labels --res_dir path/to/folder/where/save/results
 ```
 
 ## Train
 * Configure `opt.py` file
-* Pre-train the YOLOv3 on clear weather dataset for your object detection task and put the pre-trained model in `checkpoints\`
-* OR use our YOLOv3 model pre-trained on [KITTI object detection dataset](https://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=2d) for 8 classes: `checkpoints/YOLOv3_clear_kitti_pretrained.pt`
+* Pre-train the YOLOv3 on clear weather dataset for your object detection task and put the pre-trained model in `checkpoints/` folder
+
+or 
+
+use our YOLOv3 model pre-trained on [KITTI object detection dataset](https://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=2d) for 8 classes: `checkpoints/YOLOv3_clear_kitti_pretrained.pt`
 * Run:
 ```bash
 python main.py --data_root path/to/data/root/ 
