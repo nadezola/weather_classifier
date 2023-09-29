@@ -7,6 +7,7 @@ from lib.dataset import get_dataloader
 import logging
 from pathlib import Path
 from sklearn.metrics import accuracy_score
+from datetime import datetime
 
 
 log = logging.getLogger('Main')
@@ -44,6 +45,7 @@ def validate_cls_head(model, opt, val_dataset):
 
 def train_cls_head(model, opt, data_root, res_dir, 
                    fname_weights='CLS_WEATHER_head_weights.pt', fname_eval='train_evaluation.txt'):
+    start_time = datetime.now()
     device = opt.device
 
     train_dataset = get_dataloader(opt, data_root, 'train', shuffle=True)
@@ -99,11 +101,13 @@ def train_cls_head(model, opt, data_root, res_dir,
             torch.save(model.class_head.state_dict(), Path(res_dir) / fname_weights)
             log.info(f'>> New best saved to {Path(res_dir) / fname_weights}\n')
 
-    log.info(f'Done. Trained for {epoch} epochs. Best Loss={best_loss:.2f} in Epoch={best_epoch} '
-             f'with Acc={best_acc * 100}.')
+    runtime = datetime.now() - start_time
+
+    log.info(f'Done.\nTrained {epoch} epochs in a time of {runtime}.\nBest Loss = {best_loss:.2f} on Epoch = {best_epoch} '
+             f'\nAcc = {best_acc * 100}.')
 
     with open(Path(res_dir) / fname_eval, 'w') as f:
-        print(f'Phase = train\n\n', file=f)
+        print(f'Phase "train"\n', file=f)
         print(f'Epochs = {opt.epochs}', file=f)
         print(f'Batch_size = {opt.batch_size}', file=f)
         print(f'Image_size = {opt.img_size}', file=f)
@@ -111,5 +115,6 @@ def train_cls_head(model, opt, data_root, res_dir,
         print(f'Pretrained_det_model: {opt.obj_det_clear_pretrained_model} for {opt.obj_det_numcls}', file=f)
         print(f'Augment = {opt.augment}', file=f)
         print(f'Number_workers = {opt.workers}\n\n', file=f)
-        print(f'Best Loss={best_loss:.2f} in Epoch={best_epoch} with Acc={best_acc * 100}.', file=f)
+        print(f'Time: {runtime}', file=f)
+        print(f'Best Loss: {best_loss:.2f} on Epoch {best_epoch}\nAcc: {best_acc * 100}', file=f)
 
