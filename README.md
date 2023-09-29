@@ -1,5 +1,10 @@
 # Weather Classifier
-Image Weather Classification with inspiration from [DILAM](https://arxiv.org/abs/2305.18953).
+Image Weather Classification module with inspiration from [DILAM paper](https://arxiv.org/abs/2305.18953) & [DILAM Github](https://github.com/jmiemirza/DILAM). 
+
+This machine learning approach uses the first two layers of [YOLOv3](https://github.com/ultralytics/yolov3) object detection model, pre-trained on a clear weather 
+dataset, for further image classication of adverse weather conditions.
+
+![](docs/DILAM.png "DILAM")
 
 ## Installation on Ubuntu 20.04
 * Clone the repository recursively:
@@ -91,9 +96,9 @@ data_root
 ```
 * We provide example code to split the data by weather conditions:
 ```bash
-  python data_splitting.py --data_root <path/to/data_root> 
-                           --weather_lbls <path/to/weather_labels>
-                           --res_dir <path/to/folder/where/save/results>
+python data_splitting.py --data_root <path/to/data_root> 
+                         --weather_lbls <path/to/weather_labels>
+                         --res_dir <path/to/folder/where/save/results>
 ```
 
 ## Train
