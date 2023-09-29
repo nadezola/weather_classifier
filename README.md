@@ -91,7 +91,9 @@ data_root
 ```
 * We provide example code to split the data by weather conditions:
 ```bash
-  python data_splitting.py --data_root path/to/data_root --weather_lbls path/to/weather_labels --res_dir path/to/folder/where/save/results
+  python data_splitting.py --data_root <path/to/data_root> 
+                           --weather_lbls <path/to/weather_labels>
+                           --res_dir <path/to/folder/where/save/results>
 ```
 
 ## Train
@@ -100,7 +102,7 @@ data_root
 * **or** use our YOLOv3 model pre-trained on [KITTI object detection dataset](https://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=2d) for 8 classes: `checkpoints/YOLOv3_clear_kitti_pretrained.pt`
 * Run:
 ```bash
-python main.py --data_root path/to/data/root/ 
+python main.py --data_root <path/to/data/root/> 
                --phase 'train'
-               --res_dir path/to/folder/where/save/results
+               --res_dir <path/to/folder/where/save/results>
 ```
