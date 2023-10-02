@@ -4,7 +4,6 @@ from torch.utils.data import Dataset
 from torch.utils.data import DataLoader
 import cv2
 import numpy as np
-#from DILAM.utils.datasets import letterbox
 
 
 def letterbox(img, new_shape=(640, 640), color=(114, 114, 114), auto=True, scaleFill=False, scaleup=True, stride=32):
@@ -87,7 +86,7 @@ class ImageDataset(Dataset):
 
         img = img[:, :, ::-1].transpose(2, 0, 1)  # BGR to RGB, to 3x416x416
         img = np.ascontiguousarray(img)
-        return torch.from_numpy(img), target
+        return torch.from_numpy(img), target, img_path.name
 
 
 def get_dataloader(opt, data_root, phase, shuffle=False):
