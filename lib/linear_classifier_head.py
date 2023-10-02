@@ -55,6 +55,7 @@ def train_cls_head(model, opt, data_root, res_dir,
     scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[25, 40], gamma=0.1)
     criterion = nn.CrossEntropyLoss()
 
+    # Train
     best_loss = 10e+10
     best_acc = 0
     best_epoch = -1
@@ -93,7 +94,7 @@ def train_cls_head(model, opt, data_root, res_dir,
         acc, loss = validate_cls_head(model, opt, val_dataset)
         log.info(f'\t:: Acc={acc * 100:.1f} :: Loss={loss:.2f}')
 
-        # Save
+        # Save best
         if loss < best_loss:
             best_loss = loss
             best_acc = acc
@@ -112,7 +113,7 @@ def train_cls_head(model, opt, data_root, res_dir,
         print(f'Batch_size = {opt.batch_size}', file=f)
         print(f'Image_size = {opt.img_size}', file=f)
         print(f'CLS_WEATHER = {opt.CLS_WEATHER}', file=f)
-        print(f'Pretrained_det_model: {opt.obj_det_clear_pretrained_model} for {opt.obj_det_numcls}', file=f)
+        print(f'Pretrained_det_model: {opt.obj_det_clear_pretrained_model} for {opt.obj_det_numcls} object classes', file=f)
         print(f'Augment = {opt.augment}', file=f)
         print(f'Number_workers = {opt.workers}\n\n', file=f)
         print(f'Time: {runtime}', file=f)
