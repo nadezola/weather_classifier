@@ -1,9 +1,6 @@
 """
 Weather classification module.
 Uses first two layers of pre-trained YOLOv3 object detection model.
-
-Usage:
-    python main.py --data_root <path/to/data/root> --phase {'train'|'evaluate'} --res_dir <path/to/folder/where/save/results>
 """
 
 import argparse
@@ -26,21 +23,21 @@ def make_dir(dir):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_root', default='data', help='Path to data root')
-    parser.add_argument('--phase', default='test', choices=['train', 'eval', 'test'],
+    parser.add_argument('--mode', default='test', choices=['train', 'eval', 'demo'],
                         help='Running mode')
     parser.add_argument('--weights', default='checkpoints/CLS_WEATHER_head_weights.pt',
-                        help='Weather classification weights (refers to the evaluation and test phases')
+                        help='Weather classification weights (refers to the evaluation and test modes')
     parser.add_argument('--res_dir', default='results', help='Path to result directory')
     parser.add_argument('--novis', action='store_true',
-                        help='Do not visualize weather classification results (refers to the evaluation and test phases)')
+                        help='Do not visualize weather classification results (refers to the evaluation and test modes)')
 
     args = parser.parse_args()
     return args
 
 
-def main(opt, phase, data_root, res_dir, weights, novis=False):
+def main(opt, mode, data_root, res_dir, weights, novis=False):
     now = datetime.now()
-    res_dir = Path(res_dir) / f'exp_{now.strftime("%Y%m%d_%H%M")}_{phase}'
+    res_dir = Path(res_dir) / f'exp_{now.strftime("%Y%m%d_%H%M")}_{mode}'
     make_dir(res_dir)
     if not novis:
         make_dir(res_dir / 'vis')
@@ -54,14 +51,17 @@ def main(opt, phase, data_root, res_dir, weights, novis=False):
     model.load_state_dict(state_dict, strict=False)
     model.to(device)
 
-    if phase == 'train':
+    if mode == 'train':
         linear_classifier_head.train(model, opt, data_root, res_dir)
-    if phase == 'eval':
+    if mode == 'eval':
+        data_split = 'val'
         model.class_head.load_state_dict(torch.load(weights, map_location=device))
-        linear_classifier_head.evaluate(model, opt, data_root, res_dir, novis, fname_weights=weights)
-    if phase == 'test':
+        linear_classifier_head.evaluate(model, opt, data_root, res_dir, data_split, novis,
+                                        fname_weights=weights)
+    if mode == 'demo':
+        data_split = 'test'
         model.class_head.load_state_dict(torch.load(weights, map_location=device))
-        linear_classifier_head.test(model, opt, data_root, res_dir, novis)
+        linear_classifier_head.demo(model, opt, data_root, res_dir, data_split, novis)
 
 
 if __name__ == '__main__':
@@ -74,5 +74,5 @@ if __name__ == '__main__':
         log.info('CUDA is not available. Working on CPU')
         opt.device = torch.device('cpu')
 
-    log.info(f'Phase: {args.phase}')
-    main(opt, args.phase, args.data_root, args.res_dir, args.weights, args.novis)
+    log.info(f'Mode: {args.mode}')
+    main(opt, args.mode, args.data_root, args.res_dir, args.weights, args.novis)

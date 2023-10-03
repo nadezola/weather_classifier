@@ -1,5 +1,5 @@
 # Weather Classifier
-Image Weather Classification module with inspiration from [DILAM paper](https://arxiv.org/abs/2305.18953) & [DILAM Github](https://github.com/jmiemirza/DILAM). 
+Image Weather Classification module from [DILAM paper](https://arxiv.org/abs/2305.18953) & [DILAM Github](https://github.com/jmiemirza/DILAM). 
 
 This machine learning approach uses the first two layers of [YOLOv3](https://github.com/ultralytics/yolov3) object detection model, pre-trained on a clear weather 
 dataset, for further image classication of adverse weather conditions.
@@ -16,7 +16,7 @@ git clone --recurse-submodules https://github.com/nadezola/weather_classifier.gi
 git submodule update --init
 ```
 
-* We recommend to use Python3.8 virtual environment with `requirements.txt`
+* We recommend to use Python3.8 virtual environment with `requirements.txt`:
 
 ```bash
 # apt install python3.8-venv
@@ -25,7 +25,7 @@ source .venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
 ```
-* Working directory is the root of the repository.
+
 
 ## Dataset preparation
 ### Data structure:
@@ -33,88 +33,96 @@ pip install -r requirements.txt
 data_root
 |
 ├── images
-|      ├─── test
-|      |     ├─── *.jpg
+|      ├──── test
+|      |      ├─── *.jpg
 |      |
-|      ├─── train
-|      |     ├─── i*.jpg
+|      ├──── train
+|      |      ├─── *.jpg
 |      |
-|      ├─── val
-|      |     ├─── *.jpg
-|      |
-|      └─── eval (optional)
-|            ├─── *.jpg
+|      └──── val
+|             ├─── *.jpg
 |
-├── labels
-|      └─── test
-|      |     ├─── *.txt
+├── splits
+|      ├──── clear
+|      |      ├─── train.txt
+|      |      └─── val.txt
 |      |
-|      └─── train
-|      |     ├─── *.txt
+|      ├──── fog
+|      |      ├─── train.txt
+|      |      └─── val.txt
 |      |
-|      └─── val
-|            ├─── *.txt
-|
-├── splits (initially empty folder)
+|      ├──── rain
+|      |      ├─── train.txt
+|      |      └─── val.txt
+|      |
+|      └─── snow
+|            ├─── train.txt
+|            └─── val.txt
 |
 ├── test.txt
 ├── train.txt
 ├── val.txt
 |
-└── weather_labels.csv
+└── weather_labels.csv 
 ```
 * `test.txt`, `train.txt`, `val.txt` contain a list of images defining the train/val/test splits.
-* `weather_labels.csv` contains annotations of weather conditions. Example:
-
-| Image Name | Weather |
-|----------------------|---------|
-| vienna20181007_f0    | fog     |
-| vienna20181007_f1    | fog     |
 
 ### Splitting by Weather Condition:
-To train the Weather Classifier for 4 classes _**clear, fog, rain, snow**_, you need to split train and val datsets by weather conditions:
-```
-data_root
-|
-...
-|
-├── splits (initially empty folder)
-|      └─── clear
-|      |     ├─── train.txt
-|      |     ├─── val.txt
-|      |     └─── eval.txt (optional)
-|      |
-|      └─── fog
-|      |     ├─── train.txt
-|      |     ├─── val.txt
-|      |     └─── eval.txt (optional)
-|      |
-|      └─── rain
-|      |     ├─── train.txt
-|      |     ├─── val.txt
-|      |     └─── eval.txt (optional)
-|      |
-|      └─── snow
-|            ├─── train.txt
-|      |     ├─── val.txt
-|      |     └─── eval.txt (optional)
-...
-|
-```
-* We provide example code to split the data by weather conditions:
+* To train the Weather Classifier for 4 classes: _**clear, fog, rain, snow**_, you need to split 
+the entire `train.txt` and `val.txt` by weather conditions and fill up the folder `splits`
+* We provide example code to split the entire `train.txt` and `val.txt` by weather conditions, using
+`weather_labels.csv` annotation file  
+* Example of `weather_labels.csv`:
+
+| Hash              | Weather |
+|-------------------|---------|
+| vienna20181007_f0 | fog     |
+| vienna20181007_f1 | fog     |
+| ...               |         |
+| vienna20181015_f0 | rain    |
+
+* Usage:
 ```bash
 python data_splitting.py --data_root <path/to/data_root> 
                          --weather_lbls <path/to/weather_labels>
-                         --res_dir <path/to/folder/where/save/results>
+                         --res_dir <path/to/folder/where/to/save/results>
 ```
 
 ## Train
+Train the Weather Classification Head
 * Configure `opt.py` file
-* Pre-train the YOLOv3 on clear weather dataset for your object detection task and put the pre-trained model in `checkpoints/` folder
-* **or** use our YOLOv3 model pre-trained on [KITTI object detection dataset](https://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=2d) for 8 classes: `checkpoints/YOLOv3_clear_kitti_pretrained.pt`
+* Pre-train the YOLOv3 on clear weather dataset for your object detection task 
+and put the pre-trained model in `checkpoints` folder
+* **or** use our YOLOv3 model pre-trained on [KITTI object detection dataset](https://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=2d) for 8 classes `checkpoints/YOLOv3_clear_kitti_pretrained.pt`
 * Run:
 ```bash
 python main.py --data_root <path/to/data/root/> 
-               --phase 'train'
-               --res_dir <path/to/folder/where/save/results>
+               --mode 'train'
+               --res_dir <path/to/folder/where/to/save/results>
+```
+
+## Evaluate
+Evaluate the Weather Classification performance on validation dataset.
+* Configure `opt.py` file
+* Put the weights of Weather Classification Head in `checkpoints` folder
+* Run:
+```bash
+python main.py --data_root <path/to/data/root/> 
+               --mode 'eval'
+               --weights <path/to/weather/classification/weights>
+               --res_dir <path/to/folder/where/to/save/results>
+               # --novis option to DO NOT visualize weather classification results
+```
+
+## Test
+Play the Weather Classifier on test dataset. No labels needed.
+* Configure `opt.py` file
+* Put the weights of Weather Classification Head in `checkpoints` folder
+* Run:
+```bash
+python main.py --data_root <path/to/data/root/> 
+               --mode 'demo'
+               --weights <path/to/weather/classification/weights>
+               --res_dir <path/to/folder/where/to/save/results>
+               # --novis option to DO NOT visualize weather classification results
 ```

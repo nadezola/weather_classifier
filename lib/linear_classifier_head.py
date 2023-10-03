@@ -11,13 +11,12 @@ from datetime import datetime
 import cv2
 import matplotlib
 import matplotlib.pyplot as plt
-matplotlib.use('TkAgg')
 
 
 log = logging.getLogger('Main')
 
 
-def validation(model, opt, dataset):
+def validate(model, opt, dataset):
     device = opt.device
     model.eval()
     criterion = nn.CrossEntropyLoss()
@@ -52,8 +51,8 @@ def train(model, opt, data_root, res_dir,
                    fname_weights='CLS_WEATHER_head_weights.pt', fname_eval='train_evaluation.txt'):
     start_time = datetime.now()
 
-    train_dataset = get_dataloader(opt, data_root, 'train', shuffle=True)
-    val_dataset = get_dataloader(opt, data_root, 'val', shuffle=True)
+    train_dataset = get_dataloader(opt, data_root, split='train', shuffle=True)
+    val_dataset = get_dataloader(opt, data_root, split='val', shuffle=True)
 
     device = opt.device
     optimizer = optim.SGD(model.class_head.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4, nesterov=True)
@@ -96,7 +95,7 @@ def train(model, opt, data_root, res_dir,
             bar.set_postfix_str(f'batch_size {opt.batch_size}, loss {loss:.2f}')
 
         # Validation
-        acc, loss = validation(model, opt, val_dataset)
+        acc, loss = validate(model, opt, val_dataset)
         log.info(f'\t:: Acc={acc * 100:.1f} :: Loss={loss:.2f}')
 
         # Save best
@@ -113,7 +112,7 @@ def train(model, opt, data_root, res_dir,
     log.info(f'Done.\nTrained {epoch} epochs in a time of {runtime}.\nBest Loss = {best_loss:.2f} on Epoch = {best_epoch} '
              f'\nAcc = {best_acc * 100}.')
     with open(Path(res_dir) / fname_eval, 'w') as f:
-        print(f'Phase Train\n', file=f)
+        print(f'Mode Train\n', file=f)
         print(f'Epochs = {opt.epochs}', file=f)
         print(f'Batch size = {opt.batch_size}', file=f)
         print(f'Image size = {opt.img_size}', file=f)
@@ -126,12 +125,12 @@ def train(model, opt, data_root, res_dir,
         print(f'Best Loss = {best_loss:.2f} on Epoch = {best_epoch}\nAcc = {best_acc * 100}', file=f)
 
 
-def evaluate(model, opt, data_root, res_dir, novis, fname_weights='', fname_eval='res_evaluation.txt'):
+def evaluate(model, opt, data_root, res_dir, data_split, novis, fname_weights='', fname_eval='res_evaluation.txt'):
     device = opt.device
     model.eval()
     criterion = nn.CrossEntropyLoss()
 
-    eval_dataset = get_dataloader(opt, data_root, 'eval', shuffle=False)
+    eval_dataset = get_dataloader(opt, data_root, split=data_split, shuffle=False)
 
     # Run
     predictions = []
@@ -156,7 +155,7 @@ def evaluate(model, opt, data_root, res_dir, novis, fname_weights='', fname_eval
             if not novis:
                 for img_name, pred, lbl in zip(img_names, batch_preds.tolist(), labels.tolist()):
                     s = f'Prediction - {opt.CLS_WEATHER[pred]} :: Label - {opt.CLS_WEATHER[lbl]}'
-                    img = cv2.imread(str(Path(data_root) / 'images' / 'eval' / img_name))
+                    img = cv2.imread(str(Path(data_root) / 'images' / data_split / img_name))
                     img = cv2.putText(img, text=s, org=(50, 50), fontFace=cv2.FONT_HERSHEY_SIMPLEX, fontScale=1,
                                       color=(0, 0, 0), thickness=2)
                     cv2.imwrite(str(res_dir / 'vis' / img_name), img)
@@ -177,7 +176,7 @@ def evaluate(model, opt, data_root, res_dir, novis, fname_weights='', fname_eval
     log.info(res_eval)
     log.info(f'Confusion Matrix:\n{conf_matrix}')
     with open(Path(res_dir) / fname_eval, 'w') as f:
-        print(f'Phase Evaluation\n', file=f)
+        print(f'Mode Evaluation\n', file=f)
         print(f'Classes = {opt.CLS_WEATHER}', file=f)
         print(f'Weights for the Classification Head = {fname_weights}', file=f)
         print(f'Pretrained Detection Model = {opt.obj_det_clear_pretrained_model}\n'
@@ -192,11 +191,11 @@ def evaluate(model, opt, data_root, res_dir, novis, fname_weights='', fname_eval
     metrics.ConfusionMatrixDisplay(conf_matrix, display_labels=opt.CLS_WEATHER).plot(cmap='Blues')
     plt.savefig(Path(res_dir) / 'confusion_matrix.png')
 
-def test(model, opt, data_root, res_dir, novis):
+def demo(model, opt, data_root, res_dir, data_split, novis):
     device = opt.device
     model.eval()
 
-    test_dataset = get_dataloader(opt, data_root, 'test', shuffle=False)
+    test_dataset = get_dataloader(opt, data_root, split=data_split, phase='test', shuffle=False)
 
     # Run
     for batch_idx, (imgs, _, img_names) in tqdm(enumerate(test_dataset), desc=f'Test', total=len(test_dataset), unit=' batch'):

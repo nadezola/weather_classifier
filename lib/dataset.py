@@ -40,7 +40,7 @@ def letterbox(img, new_shape=(640, 640), color=(114, 114, 114), auto=True, scale
 
 
 class ImageDataset(Dataset):
-    def __init__(self, opt, data_root, phase):
+    def __init__(self, opt, data_root, split, phase):
         self.img_size = opt.img_size
         self.CLS_WEATHER = opt.CLS_WEATHER
         self.augment = opt.augment
@@ -49,15 +49,15 @@ class ImageDataset(Dataset):
         self.labels = []
 
         if self.phase == 'test':
-            p = Path(data_root) / 'images' / self.phase
+            p = Path(data_root) / 'images' / split
             self.img_files = sorted(list(p.glob('*')))
         else:
             for l in range(len(self.CLS_WEATHER)):
-                p = Path(data_root) / 'splits' / self.CLS_WEATHER[l] / f'{self.phase}.txt'
+                p = Path(data_root) / 'splits' / self.CLS_WEATHER[l] / f'{split}.txt'
                 if not p.is_file():
                     raise Exception(f'{p} does not exist or is not a file')
                 with open(p, 'r') as f:
-                    fnames = [Path(data_root) / 'images' / self.phase / line.strip() for line in f]
+                    fnames = [Path(data_root) / 'images' / split / line.strip() for line in f]
                     self.img_files.extend(fnames)
                     self.labels.extend([l] * len(fnames))
                 assert self.img_files, 'No images found'
@@ -89,10 +89,10 @@ class ImageDataset(Dataset):
         return torch.from_numpy(img), target, img_path.name
 
 
-def get_dataloader(opt, data_root, phase, shuffle=False):
+def get_dataloader(opt, data_root, split, phase='train', shuffle=False):
     from DILAM.utils.torch_utils import torch_distributed_zero_first
     with torch_distributed_zero_first(-1):
-        ds = ImageDataset(opt, data_root, phase)
+        ds = ImageDataset(opt, data_root, split, phase)
     loader = DataLoader(ds, batch_size=opt.batch_size, shuffle=shuffle, num_workers=opt.workers,
                         pin_memory=True, drop_last=False)
 
