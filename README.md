@@ -39,7 +39,10 @@ data_root
 |      ├─── train
 |      |     ├─── i*.jpg
 |      |
-|      └─── val
+|      ├─── val
+|      |     ├─── *.jpg
+|      |
+|      └─── eval (optional)
 |            ├─── *.jpg
 |
 ├── labels
@@ -78,19 +81,23 @@ data_root
 ├── splits (initially empty folder)
 |      └─── clear
 |      |     ├─── train.txt
-|      |     └─── val.txt
+|      |     ├─── val.txt
+|      |     └─── eval.txt (optional)
 |      |
 |      └─── fog
 |      |     ├─── train.txt
-|      |     └─── val.txt
+|      |     ├─── val.txt
+|      |     └─── eval.txt (optional)
 |      |
 |      └─── rain
 |      |     ├─── train.txt
-|      |     └─── val.txt
+|      |     ├─── val.txt
+|      |     └─── eval.txt (optional)
 |      |
 |      └─── snow
 |            ├─── train.txt
-|            └─── val.txt
+|      |     ├─── val.txt
+|      |     └─── eval.txt (optional)
 ...
 |
 ```

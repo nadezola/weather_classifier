@@ -6,9 +6,12 @@ from tqdm import tqdm
 from lib.dataset import get_dataloader
 import logging
 from pathlib import Path
-from sklearn.metrics import accuracy_score
+from sklearn import metrics
 from datetime import datetime
 import cv2
+import matplotlib
+import matplotlib.pyplot as plt
+matplotlib.use('TkAgg')
 
 
 log = logging.getLogger('Main')
@@ -39,7 +42,7 @@ def validation(model, opt, dataset):
             gts.extend(labels.tolist())
             bar.set_postfix_str(f'batch_size {opt.batch_size}, loss {loss:.2f}')
 
-    acc = accuracy_score(y_true=gts, y_pred=predictions)
+    acc = metrics.accuracy_score(y_true=gts, y_pred=predictions)
     model.train()
 
     return acc, mean(loss_values)
@@ -93,7 +96,7 @@ def train(model, opt, data_root, res_dir,
             bar.set_postfix_str(f'batch_size {opt.batch_size}, loss {loss:.2f}')
 
         # Validation
-        acc, loss = model_evaluation(model, opt, val_dataset, phase='validation')
+        acc, loss = validation(model, opt, val_dataset)
         log.info(f'\t:: Acc={acc * 100:.1f} :: Loss={loss:.2f}')
 
         # Save best
@@ -106,19 +109,21 @@ def train(model, opt, data_root, res_dir,
 
     runtime = datetime.now() - start_time
 
+    # Report
     log.info(f'Done.\nTrained {epoch} epochs in a time of {runtime}.\nBest Loss = {best_loss:.2f} on Epoch = {best_epoch} '
              f'\nAcc = {best_acc * 100}.')
     with open(Path(res_dir) / fname_eval, 'w') as f:
-        print(f'Phase "train"\n', file=f)
+        print(f'Phase Train\n', file=f)
         print(f'Epochs = {opt.epochs}', file=f)
-        print(f'Batch_size = {opt.batch_size}', file=f)
-        print(f'Image_size = {opt.img_size}', file=f)
-        print(f'CLS_WEATHER = {opt.CLS_WEATHER}', file=f)
-        print(f'Pretrained_det_model: {opt.obj_det_clear_pretrained_model} for {opt.obj_det_numcls} object classes', file=f)
+        print(f'Batch size = {opt.batch_size}', file=f)
+        print(f'Image size = {opt.img_size}', file=f)
+        print(f'Classes = {opt.CLS_WEATHER}', file=f)
+        print(f'Pretrained Detection Model = {opt.obj_det_clear_pretrained_model}\n'
+              f'  for {opt.obj_det_numcls} Object Classes = {opt.obj_det_cls}', file=f)
         print(f'Augment = {opt.augment}', file=f)
-        print(f'Number_workers = {opt.workers}\n\n', file=f)
-        print(f'Time: {runtime}', file=f)
-        print(f'Best Loss: {best_loss:.2f} on Epoch {best_epoch}\nAcc: {best_acc * 100}', file=f)
+        print(f'Number workers = {opt.workers}\n', file=f)
+        print(f'Running Time = {runtime}', file=f)
+        print(f'Best Loss = {best_loss:.2f} on Epoch = {best_epoch}\nAcc = {best_acc * 100}', file=f)
 
 
 def evaluate(model, opt, data_root, res_dir, novis, fname_weights='', fname_eval='res_evaluation.txt'):
@@ -128,11 +133,12 @@ def evaluate(model, opt, data_root, res_dir, novis, fname_weights='', fname_eval
 
     eval_dataset = get_dataloader(opt, data_root, 'eval', shuffle=False)
 
+    # Run
     predictions = []
     gts = []
     loss_values = []
     for batch_idx, (imgs, labels, img_names) in (bar := tqdm(enumerate(eval_dataset),
-                                                             desc=f'\tEvaluation',
+                                                             desc=f'Evaluation',
                                                              total=len(eval_dataset),
                                                              unit=' batch')):
         with torch.no_grad():
@@ -157,21 +163,34 @@ def evaluate(model, opt, data_root, res_dir, novis, fname_weights='', fname_eval
 
             bar.set_postfix_str(f'batch_size {opt.batch_size}, loss {loss:.2f}')
 
-    acc = accuracy_score(y_true=gts, y_pred=predictions)
+    # Metrics
+    acc = metrics.accuracy_score(y_true=gts, y_pred=predictions)
     loss = mean(loss_values)
+    conf_matrix = metrics.confusion_matrix(y_true=gts, y_pred=predictions, normalize='pred')
+    # res_eval_dic = metrics.classification_report(y_true=gts, y_pred=predictions, target_names=opt.CLS_WEATHER,
+    #                                            output_dict=True, zero_division=0.)
+    res_eval = metrics.classification_report(y_true=gts, y_pred=predictions, target_names=opt.CLS_WEATHER,
+                                               output_dict=False, zero_division=0.)
 
-    log.info(f'\t:: Acc={acc * 100:.1f} :: Loss={loss:.2f}')
-    log.info(f'Done')
+    # Report
+    log.info(f':: Acc={acc * 100:.1f} :: Loss={loss:.2f}')
+    log.info(res_eval)
+    log.info(f'Confusion Matrix:\n{conf_matrix}')
     with open(Path(res_dir) / fname_eval, 'w') as f:
-        print(f'Phase "Evaluation"\n', file=f)
-        print(f'CLS_WEATHER = {opt.CLS_WEATHER}', file=f)
-        print(f'Weather classification weights: {fname_weights}', file=f)
-        print(f'Pretrained_det_model: {opt.obj_det_clear_pretrained_model} for {opt.obj_det_numcls} object classes',
-              file=f)
-        print(f'Image_size = {opt.img_size}', file=f)
-        print(f'Augment = {opt.augment}', file=f)
-        print(f'Loss: {loss:.2f}\nAcc: {acc * 100}', file=f)
+        print(f'Phase Evaluation\n', file=f)
+        print(f'Classes = {opt.CLS_WEATHER}', file=f)
+        print(f'Weights for the Classification Head = {fname_weights}', file=f)
+        print(f'Pretrained Detection Model = {opt.obj_det_clear_pretrained_model}\n'
+              f'  for {opt.obj_det_numcls} Object Classes = {opt.obj_det_cls}', file=f)
+        print(f'Image size = {opt.img_size}', file=f)
+        print(f'Augment = {opt.augment}\n', file=f)
+        print(f'Loss = {loss:.2f}\n', file=f)
+        print(res_eval, file=f)
+        print(f'Confusion Matrix:\n{conf_matrix}', file=f)
 
+    # Plot Confusion matrix
+    metrics.ConfusionMatrixDisplay(conf_matrix, display_labels=opt.CLS_WEATHER).plot(cmap='Blues')
+    plt.savefig(Path(res_dir) / 'confusion_matrix.png')
 
 def test(model, opt, data_root, res_dir, novis):
     device = opt.device
@@ -179,7 +198,8 @@ def test(model, opt, data_root, res_dir, novis):
 
     test_dataset = get_dataloader(opt, data_root, 'test', shuffle=False)
 
-    for batch_idx, (imgs, _, img_names) in tqdm(enumerate(test_dataset), desc=f'\tTest', total=len(test_dataset), unit=' batch'):
+    # Run
+    for batch_idx, (imgs, _, img_names) in tqdm(enumerate(test_dataset), desc=f'Test', total=len(test_dataset), unit=' batch'):
         with torch.no_grad():
             imgs = imgs.to(device).float()/255
             outputs = model.forward_cls(imgs).view([-1, len(opt.CLS_WEATHER)])
