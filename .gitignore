@@ -6,5 +6,4 @@ checkpoints/*
 results/*
 
 # exception to the rule
-!data/.gitkeep
 !checkpoints/.gitkeep
