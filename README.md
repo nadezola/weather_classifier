@@ -91,9 +91,8 @@ python data_splitting.py --data_root <path/to/data_root>
 ## Train
 Train the Weather Classification Head
 * Configure `opt.py` file
-* Pre-train the YOLOv3 on clear weather dataset for your object detection task 
+* Pre-train the YOLOv3 model on clear weather dataset for your object detection task 
 and put the pre-trained model in `checkpoints` folder
-* **or** use our YOLOv3 model pre-trained on [KITTI object detection dataset](https://www.cvlibs.net/datasets/kitti/eval_object.php?obj_benchmark=2d) for 8 classes `checkpoints/YOLOv3_clear_kitti_pretrained.pt`
 * Run:
 ```bash
 python main.py --data_root <path/to/data/root/> 
