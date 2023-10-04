@@ -92,7 +92,7 @@ def train(model, opt, data_root, res_dir,
             loss.backward()
             optimizer.step()
             scheduler.step()
-            bar.set_postfix_str(f'batch_size {opt.batch_size}, loss {loss:.2f}')
+            bar.set_postfix_str(f'batch_size {opt.batch_size}, loss {loss:.2f}, lr {scheduler.get_last_lr()[0]}')
 
         # Validation
         acc, loss = validate(model, opt, val_dataset)
