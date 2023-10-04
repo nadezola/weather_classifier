@@ -39,7 +39,7 @@ def main(opt, mode, data_root, res_dir, weights, novis=False):
     now = datetime.now()
     res_dir = Path(res_dir) / f'exp_{now.strftime("%Y%m%d_%H%M")}_{mode}'
     make_dir(res_dir)
-    if not novis:
+    if not novis and mode != 'train':
         make_dir(res_dir / 'vis')
     log.addHandler(logging.FileHandler(res_dir / 'log.txt'))
 
