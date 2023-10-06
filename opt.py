@@ -11,6 +11,6 @@ obj_det_cls = ['Car', 'Van', 'Truck', 'Pedestrian', 'Person_sitting', 'Cyclist',
 img_size = 640
 batch_size = 8
 CLS_WEATHER = ['clear', 'fog', 'rain', 'snow']
-epochs = 150
+epochs = 30
 augment = False
 workers = 2

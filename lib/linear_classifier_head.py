@@ -25,7 +25,7 @@ def validate(model, opt, dataset):
     gts = []
     loss_values = []
     for batch_idx, (imgs, labels, _) in (bar := tqdm(enumerate(dataset),
-                                                  desc='Validation',
+                                                  desc='\tValidation',
                                                   total=len(dataset),
                                                   unit=' batch')):
         with torch.no_grad():
@@ -56,7 +56,7 @@ def train(model, opt, data_root, res_dir,
 
     device = opt.device
     optimizer = optim.SGD(model.class_head.parameters(), lr=0.1, momentum=0.9, weight_decay=5e-4, nesterov=True)
-    scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[25, 40], gamma=0.1)
+    scheduler = optim.lr_scheduler.MultiStepLR(optimizer, milestones=[10, 20], gamma=0.1)
     criterion = nn.CrossEntropyLoss()
 
     # Train
@@ -91,8 +91,8 @@ def train(model, opt, data_root, res_dir,
             loss = criterion(out, targets.to(device))
             loss.backward()
             optimizer.step()
-            scheduler.step()
             bar.set_postfix_str(f'batch_size {opt.batch_size}, loss {loss:.2f}, lr {scheduler.get_last_lr()[0]}')
+        scheduler.step()
 
         # Validation
         acc, loss = validate(model, opt, val_dataset)
