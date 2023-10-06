@@ -4,7 +4,7 @@ Image Weather Classification module from [DILAM paper](https://arxiv.org/abs/230
 This machine learning approach uses the first two layers of [YOLOv3](https://github.com/ultralytics/yolov3) object detection model, pre-trained on a clear weather 
 dataset, for further image classication of adverse weather conditions.
 
-![](docs/DILAM.png "DILAM")
+![](/home/nadesha/my_projects/SAFER/WeatherClassifier/docs/DILAM_WeatherClassifier.jpg "DILAM")
 
 ## Installation on Ubuntu 20.04
 * Clone the repository recursively:
