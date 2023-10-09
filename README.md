@@ -113,14 +113,14 @@ python main.py --data_root <path/to/data/root/>
                # --novis option to DO NOT visualize weather classification results
 ```
 
-## Demo
+## Predict
 Play the Weather Classifier on test dataset. No labels needed.
 * Configure `opt.py` file
 * Put the weights of Weather Classification Head in `checkpoints` folder
 * Run:
 ```bash
 python main.py --data_root <path/to/data/root/> 
-               --mode 'demo'
+               --mode 'predict'
                --weights <path/to/weather/classification/weights>
                --res_dir <path/to/folder/where/to/save/results>
                # --novis option to DO NOT visualize weather classification results

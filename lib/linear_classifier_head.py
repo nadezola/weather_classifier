@@ -191,7 +191,7 @@ def evaluate(model, opt, data_root, res_dir, data_split, novis, fname_weights=''
     metrics.ConfusionMatrixDisplay(conf_matrix, display_labels=opt.CLS_WEATHER).plot(cmap='Blues')
     plt.savefig(Path(res_dir) / 'confusion_matrix.png')
 
-def demo(model, opt, data_root, res_dir, data_split, novis):
+def predict(model, opt, data_root, res_dir, data_split, novis):
     device = opt.device
     model.eval()
 

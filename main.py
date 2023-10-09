@@ -23,7 +23,7 @@ def make_dir(dir):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument('--data_root', default='data', help='Path to data root')
-    parser.add_argument('--mode', default='test', choices=['train', 'eval', 'demo'],
+    parser.add_argument('--mode', default='predict', choices=['train', 'eval', 'predict'],
                         help='Running mode')
     parser.add_argument('--weights', default='checkpoints/CLS_WEATHER_head_weights.pt',
                         help='Weather classification weights (refers to the evaluation and test modes')
@@ -58,10 +58,10 @@ def main(opt, mode, data_root, res_dir, weights, novis=False):
         model.class_head.load_state_dict(torch.load(weights, map_location=device))
         linear_classifier_head.evaluate(model, opt, data_root, res_dir, data_split, novis,
                                         fname_weights=weights)
-    if mode == 'demo':
+    if mode == 'predict':
         data_split = 'test'
         model.class_head.load_state_dict(torch.load(weights, map_location=device))
-        linear_classifier_head.demo(model, opt, data_root, res_dir, data_split, novis)
+        linear_classifier_head.predict(model, opt, data_root, res_dir, data_split, novis)
 
 
 if __name__ == '__main__':
