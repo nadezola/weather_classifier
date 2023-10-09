@@ -26,10 +26,11 @@ def parse_args():
     parser.add_argument('--mode', default='predict', choices=['train', 'eval', 'predict'],
                         help='Running mode')
     parser.add_argument('--weights', default='checkpoints/CLS_WEATHER_head_weights.pt',
-                        help='Weather classification weights (refers to the evaluation and test modes')
+                        help='Weather classification weights (refers to the evaluation and predict modes')
     parser.add_argument('--res_dir', default='results', help='Path to result directory')
     parser.add_argument('--novis', action='store_true',
-                        help='Do not visualize weather classification results (refers to the evaluation and test modes)')
+                        help='Do not visualize weather classification results '
+                             '(refers to the evaluation and predict modes)')
 
     args = parser.parse_args()
     return args
