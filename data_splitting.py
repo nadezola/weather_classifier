@@ -83,7 +83,7 @@ if __name__ == '__main__':
 
     make_split_dirs(res_root)
 
-    for data in [train_split, val_split]:
+    for phase, data in zip(['train', 'val'], [train_split, val_split]):
         clear_files, fog_files, rain_files, snow_files, other_files = split_set(data, weather_lbls)
         with open(res_root/'clear'/f'{phase}.txt', 'w') as f:
             f.write('\n'.join(clear_files))
