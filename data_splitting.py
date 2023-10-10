@@ -1,5 +1,5 @@
 """
-Data pre-processing part. Splits the train/val datasets by weather conditions:
+Data pre-processing part. Splits the entire train.txt and val.txt by weather conditions:
     Clear (train.txt / val.txt)
     Fog (train.txt / val.txt)
     Rain (train.txt / val.txt)
