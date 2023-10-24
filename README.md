@@ -1,7 +1,7 @@
 # Weather Classifier
 Image Weather Classification module from [DILAM paper](https://arxiv.org/abs/2305.18953) & [DILAM Github](https://github.com/jmiemirza/DILAM). 
 
-This machine learning approach uses the first two layers of [YOLOv3](https://github.com/ultralytics/yolov3) object detection model, pre-trained on a clear weather 
+This machine learning approach uses the first two layers of [YOLOv3](https://github.com/ultralytics/yolov3) (commit d353371) object detection model, pre-trained on a clear weather 
 dataset, for further image classication of adverse weather conditions.
 
 ![](docs/DILAM_WeatherClassifier.jpg "DILAM")
@@ -91,7 +91,7 @@ python data_splitting.py --data_root <path/to/data_root>
 ## Train
 Train the Weather Classification Head
 * Configure `opt.py` file
-* Pre-train the YOLOv3 model on clear weather dataset for your object detection task 
+* Pre-train the [YOLOv3](https://github.com/ultralytics/yolov3) model commit d353371 on clear weather dataset for your object detection task 
 and put the pre-trained model in `checkpoints` folder
 * Run:
 ```bash
